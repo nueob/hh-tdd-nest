@@ -1,17 +1,13 @@
 import { Body, Controller, Get, Param, Patch, ValidationPipe } from "@nestjs/common";
 import { PointHistory, TransactionType, UserPoint } from "./point.model";
-import { UserPointTable } from "src/database/userpoint.table";
-import { PointHistoryTable } from "src/database/pointhistory.table";
 import { PointBody as PointDto } from "./point.dto";
+import { PointServicePort } from "./port/point.servie.port";
 
 
 @Controller('/point')
 export class PointController {
 
-    constructor(
-        private readonly userDb: UserPointTable,
-        private readonly historyDb: PointHistoryTable,
-    ) {}
+    constructor(private readonly pointServicePort: PointServicePort) {}
 
     /**
      * TODO - 특정 유저의 포인트를 조회하는 기능을 작성해주세요.
