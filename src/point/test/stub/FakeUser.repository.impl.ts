@@ -11,4 +11,7 @@ export class FakeUserRepositoryImpl implements UserRepositoryPort {
       updateMillis: Date.now(),
     });
   }
+  updateUserPoint(userId: number, point: number): Promise<UserPoint> {
+    return Promise.resolve({ id: userId, point, updateMillis: Date.now() });
+  }
 }

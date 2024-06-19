@@ -16,4 +16,11 @@ export class FakePointRepositoryImpl implements PointRepositoryPort {
       },
     ]);
   }
+  insertPointHistories(
+    userId: number,
+    amount: number,
+    action: TransactionType,
+  ): Promise<void> {
+    return Promise.resolve();
+  }
 }
