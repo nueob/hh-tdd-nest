@@ -9,4 +9,11 @@ export class FakePointServiceImpl implements PointServicePort {
       updateMillis: Date.now(),
     });
   }
+  usePoint(userId: number, amount: number): Promise<UserPoint> {
+    return Promise.resolve({
+      id: userId,
+      point: amount,
+      updateMillis: Date.now(),
+    });
+  }
 }

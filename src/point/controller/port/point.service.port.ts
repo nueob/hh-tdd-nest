@@ -5,4 +5,8 @@ export abstract class PointServicePort {
     userId: number,
     amount: number,
   ): Promise<UserPoint | undefined>;
+  abstract usePoint(
+    userId: number,
+    amount: number,
+  ): Promise<UserPoint | undefined>;
 }

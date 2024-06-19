@@ -69,4 +69,20 @@ describe('PointController', () => {
       });
     });
   });
+
+  describe(':id/use PATCH API', () => {
+    test('특정 유저의 포인트를 사용 후 현재 유저 정보를 반환한다.', async () => {
+      //  when
+      const userId = 1;
+      const amount = 5;
+      // given
+      const response = await pointController.use(userId, { amount });
+      // then
+      expect(response).toStrictEqual({
+        id: userId,
+        point: amount,
+        updateMillis: Date.now(),
+      });
+    });
+  });
 });
