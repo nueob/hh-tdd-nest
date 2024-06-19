@@ -96,4 +96,64 @@ describe('PointController (e2e)', () => {
       expect(response.status).toBe(400);
     });
   });
+
+  describe('PATCH(:id/use) 특정 유저의 포인트를 사용한다.', () => {
+    test('특정 유저의 포인트를 사용 후 현재 유저 정보를 반환한다.', async () => {
+      //  when
+      const userId = 1;
+
+      await request(app.getHttpServer())
+        .patch(`/point/${userId}/charge`)
+        .send({ amount: 100 });
+
+      const amount = 10;
+      // given
+      const response = await request(app.getHttpServer())
+        .patch(`/point/${userId}/use`)
+        .send({ amount });
+      // then
+      expect(response.status).toBe(200);
+    });
+    /**
+     * amount를 꼭 포함해야 합니다.
+     */
+    test('body가 비었다면 400 Error를 반환한다.', async () => {
+      //  when
+      const userId = 1;
+      // given
+      const response = await request(app.getHttpServer()).patch(
+        `/point/${userId}/use`,
+      );
+      // then
+      expect(response.status).toBe(400);
+    });
+    /**
+     * 충전, 사용할 포인트는 0보다 커야합니다.
+     */
+    test('amount가 음수일 때 400 Error를 반환한다.', async () => {
+      //  when
+      const userId = 1;
+      const amount = -100;
+      // given
+      const response = await request(app.getHttpServer())
+        .patch(`/point/${userId}/use`)
+        .send({ amount });
+      // then
+      expect(response.status).toBe(400);
+    });
+    /**
+     * 충전, 사용할 포인트는 0보다 커야합니다.
+     */
+    test('amount가 0일 때 400 Error를 반환한다.', async () => {
+      //  when
+      const userId = 1;
+      const amount = 0;
+      // given
+      const response = await request(app.getHttpServer())
+        .patch(`/point/${userId}/use`)
+        .send({ amount });
+      // then
+      expect(response.status).toBe(400);
+    });
+  });
 });
