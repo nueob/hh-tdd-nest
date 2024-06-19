@@ -1,4 +1,5 @@
 import { PointController } from '../../controller/Point.controller';
+import { TransactionType } from '../../domain/Point.model';
 import { FakeUserServiceImpl } from '../stub/FakeUser.service.impl';
 
 /**
@@ -27,6 +28,25 @@ describe('PointController', () => {
         point: 0,
         updateMillis: Date.now(),
       });
+    });
+  });
+
+  describe('/:id/histories GET API', () => {
+    test('특정 유저의 포인트 충전/이용 내역이 있을 경우, 해당 내역을 배열로 반환한다.', async () => {
+      //  when
+      const userId = 1;
+      // given
+      const response = await pointController.history(userId);
+      // then
+      expect(response).toStrictEqual([
+        {
+          id: 1,
+          userId,
+          type: TransactionType.USE,
+          amount: 100,
+          timeMillis: Date.now(),
+        },
+      ]);
     });
   });
 });
