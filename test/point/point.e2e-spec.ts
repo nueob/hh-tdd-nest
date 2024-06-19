@@ -28,4 +28,17 @@ describe('PointController (e2e)', () => {
       expect(response.status).toBe(200);
     });
   });
+
+  describe('GET(/:id/histories) 특정 유저의 포인트 충전/이용 내역을 조회한다.', () => {
+    test('특정 유저의 포인트 충전/이용 내역이 있을 경우, 해당 내역을 배열로 반환한다.', async () => {
+      //  when
+      const userId = 1;
+      // given
+      const response = await request(app.getHttpServer()).get(
+        `/point/${userId}/histories`,
+      );
+      // then
+      expect(response.status).toBe(200);
+    });
+  });
 });
