@@ -8,17 +8,21 @@ import {
 } from '@nestjs/common';
 import { PointHistory, UserPoint } from '../domain/Point.model';
 import { PointBody as PointDto } from './dto/req/Point.dto';
+import { UserServicePort } from './port/User.service.port';
+
 @Controller('/point')
 export class PointController {
-  constructor() {}
+  constructor(private readonly userServicePort: UserServicePort) {}
 
   /**
    * TODO - 특정 유저의 포인트를 조회하는 기능을 작성해주세요.
+   * userId를 service로 넘겨 해당 user에 대한 포인트를 받습니다.
    */
   @Get(':id')
   async point(@Param('id') id): Promise<UserPoint> {
     const userId = Number.parseInt(id);
-    return { id: userId, point: 0, updateMillis: Date.now() };
+
+    return await this.userServicePort.findUser(userId);
   }
 
   /**
