@@ -9,10 +9,14 @@ import {
 import { PointHistory, UserPoint } from '../domain/Point.model';
 import { PointBody as PointDto } from './dto/req/Point.dto';
 import { UserServicePort } from './port/User.service.port';
+import { PointServicePort } from './port/Point.service.port';
 
 @Controller('/point')
 export class PointController {
-  constructor(private readonly userServicePort: UserServicePort) {}
+  constructor(
+    private readonly userServicePort: UserServicePort,
+    private readonly pointServicePort: PointServicePort,
+  ) {}
 
   /**
    * TODO - 특정 유저의 포인트를 조회하는 기능을 작성해주세요.
@@ -46,7 +50,8 @@ export class PointController {
   ): Promise<UserPoint> {
     const userId = Number.parseInt(id);
     const amount = pointDto.amount;
-    return { id: userId, point: amount, updateMillis: Date.now() };
+
+    return this.pointServicePort.savePoint(userId, amount);
   }
 
   /**

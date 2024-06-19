@@ -1,5 +1,6 @@
 import { PointController } from '../../controller/Point.controller';
 import { TransactionType } from '../../domain/Point.model';
+import { FakePointServiceImpl } from '../stub/FakePoint.service.impl';
 import { FakeUserServiceImpl } from '../stub/FakeUser.service.impl';
 
 /**
@@ -13,7 +14,10 @@ describe('PointController', () => {
     jest.useFakeTimers();
     jest.setSystemTime();
 
-    pointController = new PointController(new FakeUserServiceImpl());
+    pointController = new PointController(
+      new FakeUserServiceImpl(),
+      new FakePointServiceImpl(),
+    );
   });
 
   describe('/point GET API', () => {
@@ -47,6 +51,22 @@ describe('PointController', () => {
           timeMillis: Date.now(),
         },
       ]);
+    });
+  });
+
+  describe(':id/charge PATCH API', () => {
+    test('특정 유저의 포인트 충전한다.', async () => {
+      //  when
+      const userId = 1;
+      const amount = 100;
+      // given
+      const response = await pointController.charge(userId, { amount });
+      // then
+      expect(response).toStrictEqual({
+        id: userId,
+        point: amount,
+        updateMillis: Date.now(),
+      });
     });
   });
 });
