@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PointController } from './controller/Point.controller';
-import { DatabaseModule } from 'src/database/database.module';
+import { DatabaseModule } from '../database/database.module';
 import { PointServicePort } from './controller/port/Point.service.port';
 import { PointServiceImpl } from './service/Point.service.impl';
 import { PointRepositoryPort } from './service/port/Point.repository.port';
