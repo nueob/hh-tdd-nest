@@ -4,7 +4,9 @@ import { PointRepositoryPort } from './port/Point.repository.port';
 import { TransactionType, UserPoint } from '../domain/Point.model';
 import { UserRepositoryPort } from './port/User.repository.port';
 import { PointErrorCode } from '../enum/PointErrorCode.enum';
+import { Mutex } from 'async-mutex';
 
+const mutex = new Mutex();
 @Injectable()
 export class PointServiceImpl implements PointServicePort {
   constructor(
@@ -19,21 +21,26 @@ export class PointServiceImpl implements PointServicePort {
    * 4. 해당 유저의 충전된 정보를 반환합니다.
    */
   async savePoint(userId: number, amount: number): Promise<UserPoint> {
-    const user = await this.userRepositoryPort.findUser(userId);
-    if (!user) throw new Error(PointErrorCode.NO_EXISTS_USER.message);
+    await mutex.acquire();
+    try {
+      const user = await this.userRepositoryPort.findUser(userId);
+      if (!user) throw new Error(PointErrorCode.NO_EXISTS_USER.message);
 
-    const point = user.point + amount;
+      const point = user.point + amount;
 
-    const [updatedUser] = await Promise.all([
-      this.userRepositoryPort.updateUserPoint(userId, point),
-      this.pointRepositoryPort.insertPointHistories(
-        userId,
-        amount,
-        TransactionType.CHARGE,
-      ),
-    ]);
+      const [updatedUser] = await Promise.all([
+        this.userRepositoryPort.updateUserPoint(userId, point),
+        this.pointRepositoryPort.insertPointHistories(
+          userId,
+          amount,
+          TransactionType.CHARGE,
+        ),
+      ]);
 
-    return updatedUser;
+      return updatedUser;
+    } finally {
+      mutex.release();
+    }
   }
   /**
    * 1. 유저가 존재하는 지 체크
@@ -48,25 +55,30 @@ export class PointServiceImpl implements PointServicePort {
     userId: number,
     amount: number,
   ): Promise<UserPoint | undefined> {
-    const user = await this.userRepositoryPort.findUser(userId);
-    if (!user) {
-      throw new Error(PointErrorCode.NO_EXISTS_USER.message);
+    await mutex.acquire();
+    try {
+      const user = await this.userRepositoryPort.findUser(userId);
+      if (!user) {
+        throw new Error(PointErrorCode.NO_EXISTS_USER.message);
+      }
+      if (user.point < amount) {
+        throw new Error(PointErrorCode.NOT_ENOUGH_POINT.message);
+      }
+
+      const point = user.point - amount;
+
+      const [updatedUser] = await Promise.all([
+        this.userRepositoryPort.updateUserPoint(userId, point),
+        this.pointRepositoryPort.insertPointHistories(
+          userId,
+          amount,
+          TransactionType.USE,
+        ),
+      ]);
+
+      return updatedUser;
+    } finally {
+      mutex.release();
     }
-    if (user.point < amount) {
-      throw new Error(PointErrorCode.NOT_ENOUGH_POINT.message);
-    }
-
-    const point = user.point - amount;
-
-    const [updatedUser] = await Promise.all([
-      this.userRepositoryPort.updateUserPoint(userId, point),
-      this.pointRepositoryPort.insertPointHistories(
-        userId,
-        amount,
-        TransactionType.USE,
-      ),
-    ]);
-
-    return updatedUser;
   }
 }
